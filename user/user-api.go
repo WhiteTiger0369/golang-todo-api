@@ -1,6 +1,7 @@
 package user
 
 import (
+	"ex1/todo-api/helpers"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -16,30 +17,49 @@ func ProvideUserAPI(u UserService) UserAPI {
 }
 
 func (u *UserAPI) FindAll(c *gin.Context) {
-	Users := u.UserService.FindAll()
+	res, err := u.UserService.FindAll()
 
-	c.JSON(http.StatusOK, gin.H{"Users": ToUserDTOs(Users)})
+	switch err.Type {
+	case "error_01":
+		helpers.APIResponse(c, "Users data is not exists", err.Code, http.MethodGet, nil)
+	default:
+		helpers.APIResponse(c, "Results Students data successfully", http.StatusOK, http.MethodGet, res)
+	}
 }
 
 func (u *UserAPI) FindByID(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	User := u.UserService.FindByID(uint(id))
+	res, err := u.UserService.FindByID(uint(id))
 
-	c.JSON(http.StatusOK, gin.H{"User": ToUserDTO(User)})
+	switch err.Type {
+	case "error_01":
+		helpers.APIResponse(c, "Users data is not exists", err.Code, http.MethodGet, nil)
+	default:
+		helpers.APIResponse(c, "Results Students data successfully", http.StatusOK, http.MethodGet, res)
+	}
 }
 
 func (u *UserAPI) Create(c *gin.Context) {
 	var userDTO UserDTO
-	err := c.BindJSON(&userDTO)
-	if err != nil {
+	errIn := c.BindJSON(&userDTO)
+	if errIn != nil {
 		c.Status(http.StatusBadRequest)
-		log.Fatalln(err)
+		log.Fatalln(errIn)
 		return
 	}
 
-	createdUser := u.UserService.Save(ToUser(userDTO))
+	res, err := u.UserService.Save(userDTO)
 
-	c.JSON(http.StatusOK, gin.H{"User": ToUserDTO(createdUser)})
+	switch err.Type {
+	case "error_01":
+		helpers.APIResponse(c, "User already exist", err.Code, http.MethodPost, nil)
+		return
+	case "error_02":
+		helpers.APIResponse(c, "Create new user account failed", err.Code, http.MethodPost, nil)
+		return
+	default:
+		helpers.APIResponse(c, "Create new user account successfully", http.StatusCreated, http.MethodPost, res)
+	}
 }
 
 func (u *UserAPI) Update(c *gin.Context) {
@@ -52,8 +72,8 @@ func (u *UserAPI) Update(c *gin.Context) {
 	}
 
 	id, _ := strconv.Atoi(c.Param("id"))
-	user := u.UserService.FindByID(uint(id))
-	if user == (User{}) {
+	user, _ := u.UserService.FindByID(uint(id))
+	if user == (UserDTO{}) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -68,13 +88,8 @@ func (u *UserAPI) Update(c *gin.Context) {
 
 func (u *UserAPI) Delete(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	user := u.UserService.FindByID(uint(id))
-	if user == (User{}) {
-		c.Status(http.StatusBadRequest)
-		return
-	}
 
-	u.UserService.Delete(user)
+	u.UserService.Delete(uint(id))
 
 	c.Status(http.StatusOK)
 }
