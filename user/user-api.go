@@ -23,7 +23,7 @@ func (u *UserAPI) FindAll(c *gin.Context) {
 	case "error_01":
 		helpers.APIResponse(c, "Users data is not exists", err.Code, http.MethodGet, nil)
 	default:
-		helpers.APIResponse(c, "Results Students data successfully", http.StatusOK, http.MethodGet, res)
+		helpers.APIResponse(c, "Results Users data successfully", http.StatusOK, http.MethodGet, res)
 	}
 }
 
@@ -35,7 +35,7 @@ func (u *UserAPI) FindByID(c *gin.Context) {
 	case "error_01":
 		helpers.APIResponse(c, "Users data is not exists", err.Code, http.MethodGet, nil)
 	default:
-		helpers.APIResponse(c, "Results Students data successfully", http.StatusOK, http.MethodGet, res)
+		helpers.APIResponse(c, "Results Users data successfully", http.StatusOK, http.MethodGet, res)
 	}
 }
 
