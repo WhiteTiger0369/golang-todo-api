@@ -1,6 +1,7 @@
 package todo
 
 import (
+	"ex1/todo-api/helpers"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -16,30 +17,47 @@ func ProvideTodoAPI(p TodoService) TodoAPI {
 }
 
 func (t *TodoAPI) FindAll(c *gin.Context) {
-	Todos := t.todoService.FindAll()
 
-	c.JSON(http.StatusOK, gin.H{"Todos": ToTodoDTOs(Todos)})
+	res, err := t.todoService.FindAll()
+
+	switch err.Type {
+	case "error_01":
+		helpers.APIResponse(c, "Todos data is not exists", err.Code, http.MethodGet, nil)
+	default:
+		helpers.APIResponse(c, "Results Todos data successfully", http.StatusOK, http.MethodGet, res)
+	}
 }
 
 func (t *TodoAPI) FindByID(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	Todo := t.todoService.FindByID(uint(id))
+	res, err := t.todoService.FindByID(uint(id))
 
-	c.JSON(http.StatusOK, gin.H{"Todo": ToTodoDTO(Todo)})
+	switch err.Type {
+	case "error_01":
+		helpers.APIResponse(c, "Todos data is not exists", err.Code, http.MethodGet, nil)
+	default:
+		helpers.APIResponse(c, "Results Todos data successfully", http.StatusOK, http.MethodGet, res)
+	}
 }
 
 func (t *TodoAPI) Create(c *gin.Context) {
-	var TodoDTO TodoDTO
-	err := c.BindJSON(&TodoDTO)
-	if err != nil {
+	var todoDTO TodoDTO
+	errIn := c.BindJSON(&todoDTO)
+	if errIn != nil {
 		c.Status(http.StatusBadRequest)
-		log.Fatalln(err)
+		log.Fatalln(errIn)
 		return
 	}
 
-	createdTodo := t.todoService.Save(ToTodo(TodoDTO))
+	res, err := t.todoService.Save(todoDTO)
 
-	c.JSON(http.StatusOK, gin.H{"Todo": ToTodoDTO(createdTodo)})
+	switch err.Type {
+	case "error_01":
+		helpers.APIResponse(c, "Create new todo account failed", err.Code, http.MethodPost, nil)
+		return
+	default:
+		helpers.APIResponse(c, "Create new todo account successfully", http.StatusCreated, http.MethodPost, res)
+	}
 }
 
 func (t *TodoAPI) Update(c *gin.Context) {
@@ -52,8 +70,8 @@ func (t *TodoAPI) Update(c *gin.Context) {
 	}
 
 	id, _ := strconv.Atoi(c.Param("id"))
-	todo := t.todoService.FindByID(uint(id))
-	if todo == (Todo{}) {
+	todo, _ := t.todoService.FindByID(uint(id))
+	if todo == (TodoDTO{}) {
 		c.Status(http.StatusBadRequest)
 		return
 	}
@@ -67,13 +85,7 @@ func (t *TodoAPI) Update(c *gin.Context) {
 
 func (t *TodoAPI) Delete(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	todo := t.todoService.FindByID(uint(id))
-	if todo == (Todo{}) {
-		c.Status(http.StatusBadRequest)
-		return
-	}
-
-	t.todoService.Delete(todo)
+	t.todoService.Delete(uint(id))
 
 	c.Status(http.StatusOK)
 }
