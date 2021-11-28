@@ -19,6 +19,7 @@ func SetupRouter() *gin.Engine {
 
 	routes.InitTodoRoutes(database, app)
 	routes.InitUserRoutes(database, app)
+	routes.InitAuthRoutes(database, app)
 
 	return app
 }

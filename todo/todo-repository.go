@@ -1,6 +1,10 @@
 package todo
 
-import "github.com/jinzhu/gorm"
+import (
+	"ex1/todo-api/common"
+	"github.com/jinzhu/gorm"
+	"net/http"
+)
 
 type TodoRepository struct {
 	DB *gorm.DB
@@ -10,26 +14,53 @@ func ProvideTodoRepository(DB *gorm.DB) TodoRepository {
 	return TodoRepository{DB: DB}
 }
 
-func (t *TodoRepository) FindAll() []Todo {
-	var todo []Todo
-	t.DB.Find(&todo)
+func (t *TodoRepository) FindAll() ([]Todo, common.DatabaseError) {
+	var todos []Todo
+	errorCode := common.DatabaseError{}
+	results := t.DB.Debug().Find(&todos)
 
-	return todo
+	if results.RowsAffected < 1 {
+		errorCode = common.DatabaseError{
+			Code: http.StatusNotFound,
+			Type: "error_01",
+		}
+		return todos, errorCode
+	}
+
+	return todos, errorCode
 }
 
-func (t *TodoRepository) FindByID(id uint) Todo {
+func (t *TodoRepository) FindByID(id uint) (Todo, common.DatabaseError) {
 	var todo Todo
-	t.DB.First(&todo, id)
+	errorCode := common.DatabaseError{}
+	res := t.DB.First(&todo, id)
 
-	return todo
+	if res.RowsAffected < 1 {
+		errorCode = common.DatabaseError{
+			Code: http.StatusNotFound,
+			Type: "error_01",
+		}
+		return todo, errorCode
+	}
+
+	return todo, errorCode
 }
 
-func (t *TodoRepository) Save(todo Todo) Todo {
-	t.DB.Save(&todo)
+func (t *TodoRepository) Save(todo Todo) (Todo, common.DatabaseError) {
 
-	return todo
+	errorCode := common.DatabaseError{}
+	addUser := t.DB.Debug().Save(&todo)
+	if addUser.RowsAffected < 1 {
+		errorCode = common.DatabaseError{
+			Code: http.StatusForbidden,
+			Type: "error_02",
+		}
+		return todo, errorCode
+	}
+
+	return todo, errorCode
 }
 
-func (t *TodoRepository) Delete(todo Todo) {
-	t.DB.Delete(&todo)
+func (t *TodoRepository) Delete(id uint) {
+	t.DB.Delete(Todo{}, "id = ?", id)
 }

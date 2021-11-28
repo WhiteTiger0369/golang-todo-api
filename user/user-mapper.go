@@ -5,7 +5,7 @@ func ToUser(userDTO UserDTO) User {
 }
 
 func ToUserDTO(user User) UserDTO {
-	return UserDTO{ID: user.ID, FullName: user.FullName, Username: user.Username, Password: user.Password, CreatedAt: user.CreatedAt, UpdatedAt: user.UpdatedAt}
+	return UserDTO{ID: user.ID, FullName: user.FullName, Username: user.Username, CreatedAt: user.CreatedAt, UpdatedAt: user.UpdatedAt}
 }
 
 func ToUserDTOs(users []User) []UserDTO {
