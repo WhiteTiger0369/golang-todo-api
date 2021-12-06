@@ -19,5 +19,6 @@ func InitTodoRoutes(db *gorm.DB, route *gin.Engine) {
 	groupRoute.POST("/todos", api.Create)
 	groupRoute.PUT("/todos/:id", api.Update)
 	groupRoute.DELETE("/todos/:id", api.Delete)
+	groupRoute.GET("/todos/get-by-current-user", api.FindByUserId)
 
 }

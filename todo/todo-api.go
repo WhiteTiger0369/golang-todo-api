@@ -2,6 +2,7 @@ package todo
 
 import (
 	"ex1/todo-api/helpers"
+	"ex1/todo-api/pkg"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -88,4 +89,19 @@ func (t *TodoAPI) Delete(c *gin.Context) {
 	t.todoService.Delete(uint(id))
 
 	c.Status(http.StatusOK)
+}
+
+func (t *TodoAPI) FindByUserId(c *gin.Context) {
+	token, _ := pkg.VerifyTokenHeader(c, "JWT_SECRET")
+	accessToken := pkg.DecodeToken(token)
+	userId := accessToken.Claims.ID
+
+	res, err := t.todoService.FindByUserId(userId)
+
+	switch err.Type {
+	case "error_01":
+		helpers.APIResponse(c, "Todos data is not exists", err.Code, http.MethodGet, nil)
+	default:
+		helpers.APIResponse(c, "Results Todos data successfully", http.StatusOK, http.MethodGet, res)
+	}
 }

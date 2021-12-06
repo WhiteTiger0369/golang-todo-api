@@ -29,3 +29,8 @@ func (t *TodoService) Save(todoDTO TodoDTO) (TodoDTO, common.DatabaseError) {
 func (t *TodoService) Delete(id uint) {
 	t.TodoRepository.Delete(id)
 }
+
+func (t *TodoService) FindByUserId(userId uint) ([]TodoDTO, common.DatabaseError) {
+	res, err := t.TodoRepository.FindByUserId(userId)
+	return ToTodoDTOs(res), err
+}

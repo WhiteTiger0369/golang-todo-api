@@ -64,3 +64,19 @@ func (t *TodoRepository) Save(todo Todo) (Todo, common.DatabaseError) {
 func (t *TodoRepository) Delete(id uint) {
 	t.DB.Delete(Todo{}, "id = ?", id)
 }
+
+func (t *TodoRepository) FindByUserId(userId uint) ([]Todo, common.DatabaseError) {
+	var todos []Todo
+	errorCode := common.DatabaseError{}
+	results := t.DB.Debug().Find(&todos, "user_id = ?", userId)
+
+	if results.RowsAffected < 1 {
+		errorCode = common.DatabaseError{
+			Code: http.StatusNotFound,
+			Type: "error_01",
+		}
+		return todos, errorCode
+	}
+
+	return todos, errorCode
+}

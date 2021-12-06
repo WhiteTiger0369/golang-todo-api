@@ -38,7 +38,7 @@ func (u *AuthAPI) Login(c *gin.Context) {
 		return
 	default:
 		accessTokenData := map[string]interface{}{"username": checkUser.Username, "password": checkUser.Password}
-		accessToken, errToken := pkg.Sign(accessTokenData, "JWT_SECRET", 24*60*1)
+		accessToken, errToken := pkg.Sign(accessTokenData, "JWT_SECRET", 24*60*1, checkUser.ID)
 
 		if errToken != nil {
 			defer logrus.Error(errToken.Error())
