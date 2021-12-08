@@ -9,15 +9,15 @@ import (
 	"strconv"
 )
 
-type TodoAPI struct {
-	todoService TodoService
+type todoAPI struct {
+	todoService ServiceTodo
 }
 
-func ProvideTodoAPI(p TodoService) TodoAPI {
-	return TodoAPI{todoService: p}
+func ProvideTodoAPI(p ServiceTodo) *todoAPI {
+	return &todoAPI{todoService: p}
 }
 
-func (t *TodoAPI) FindAll(c *gin.Context) {
+func (t *todoAPI) FindAll(c *gin.Context) {
 
 	res, err := t.todoService.FindAll()
 
@@ -29,7 +29,7 @@ func (t *TodoAPI) FindAll(c *gin.Context) {
 	}
 }
 
-func (t *TodoAPI) FindByID(c *gin.Context) {
+func (t *todoAPI) FindByID(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	res, err := t.todoService.FindByID(uint(id))
 
@@ -41,7 +41,7 @@ func (t *TodoAPI) FindByID(c *gin.Context) {
 	}
 }
 
-func (t *TodoAPI) Create(c *gin.Context) {
+func (t *todoAPI) Create(c *gin.Context) {
 	var todoDTO TodoDTO
 	errIn := c.BindJSON(&todoDTO)
 	if errIn != nil {
@@ -61,7 +61,7 @@ func (t *TodoAPI) Create(c *gin.Context) {
 	}
 }
 
-func (t *TodoAPI) Update(c *gin.Context) {
+func (t *todoAPI) Update(c *gin.Context) {
 	var todoDTO TodoDTO
 	err := c.BindJSON(&todoDTO)
 	if err != nil {
@@ -84,14 +84,14 @@ func (t *TodoAPI) Update(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func (t *TodoAPI) Delete(c *gin.Context) {
+func (t *todoAPI) Delete(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	t.todoService.Delete(uint(id))
 
 	c.Status(http.StatusOK)
 }
 
-func (t *TodoAPI) FindByUserId(c *gin.Context) {
+func (t *todoAPI) FindByUserId(c *gin.Context) {
 	token, _ := pkg.VerifyTokenHeader(c, "JWT_SECRET")
 	accessToken := pkg.DecodeToken(token)
 	userId := accessToken.Claims.ID

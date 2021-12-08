@@ -6,15 +6,23 @@ import (
 	"net/http"
 )
 
-type TodoRepository struct {
+type RepositoryTodo interface {
+	FindAll() ([]Todo, common.DatabaseError)
+	FindByID(id uint) (Todo, common.DatabaseError)
+	Save(todo Todo) (Todo, common.DatabaseError)
+	Delete(id uint)
+	FindByUserId(userId uint) ([]Todo, common.DatabaseError)
+}
+
+type todoRepository struct {
 	DB *gorm.DB
 }
 
-func ProvideTodoRepository(DB *gorm.DB) TodoRepository {
-	return TodoRepository{DB: DB}
+func ProvideTodoRepository(DB *gorm.DB) *todoRepository {
+	return &todoRepository{DB: DB}
 }
 
-func (t *TodoRepository) FindAll() ([]Todo, common.DatabaseError) {
+func (t *todoRepository) FindAll() ([]Todo, common.DatabaseError) {
 	var todos []Todo
 	errorCode := common.DatabaseError{}
 	results := t.DB.Debug().Find(&todos)
@@ -30,7 +38,7 @@ func (t *TodoRepository) FindAll() ([]Todo, common.DatabaseError) {
 	return todos, errorCode
 }
 
-func (t *TodoRepository) FindByID(id uint) (Todo, common.DatabaseError) {
+func (t *todoRepository) FindByID(id uint) (Todo, common.DatabaseError) {
 	var todo Todo
 	errorCode := common.DatabaseError{}
 	res := t.DB.First(&todo, id)
@@ -46,7 +54,7 @@ func (t *TodoRepository) FindByID(id uint) (Todo, common.DatabaseError) {
 	return todo, errorCode
 }
 
-func (t *TodoRepository) Save(todo Todo) (Todo, common.DatabaseError) {
+func (t *todoRepository) Save(todo Todo) (Todo, common.DatabaseError) {
 
 	errorCode := common.DatabaseError{}
 	addUser := t.DB.Debug().Save(&todo)
@@ -61,11 +69,11 @@ func (t *TodoRepository) Save(todo Todo) (Todo, common.DatabaseError) {
 	return todo, errorCode
 }
 
-func (t *TodoRepository) Delete(id uint) {
+func (t *todoRepository) Delete(id uint) {
 	t.DB.Delete(Todo{}, "id = ?", id)
 }
 
-func (t *TodoRepository) FindByUserId(userId uint) ([]Todo, common.DatabaseError) {
+func (t *todoRepository) FindByUserId(userId uint) ([]Todo, common.DatabaseError) {
 	var todos []Todo
 	errorCode := common.DatabaseError{}
 	results := t.DB.Debug().Find(&todos, "user_id = ?", userId)

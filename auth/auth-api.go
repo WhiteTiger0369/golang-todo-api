@@ -10,15 +10,15 @@ import (
 	"net/http"
 )
 
-type AuthAPI struct {
-	AuthService AuthService
+type authAPI struct {
+	authService ServiceAuth
 }
 
-func ProvideAuthAPI(a AuthService) AuthAPI {
-	return AuthAPI{AuthService: a}
+func ProvideAuthAPI(a ServiceAuth) *authAPI {
+	return &authAPI{authService: a}
 }
 
-func (u *AuthAPI) Login(c *gin.Context) {
+func (u *authAPI) Login(c *gin.Context) {
 	var userReq user.User
 	errIn := c.BindJSON(&userReq)
 	if errIn != nil {
@@ -27,7 +27,7 @@ func (u *AuthAPI) Login(c *gin.Context) {
 		return
 	}
 
-	checkUser, err := u.AuthService.Login(userReq)
+	checkUser, err := u.authService.Login(userReq)
 
 	switch err.Type {
 	case "error_01":

@@ -1,7 +1,7 @@
 package todo
 
 func ToTodo(todoDTO TodoDTO) Todo {
-	return Todo{Title: todoDTO.Title, Content: todoDTO.Content}
+	return Todo{Title: todoDTO.Title, Content: todoDTO.Content, UserID: todoDTO.UserID}
 }
 
 func ToTodoDTO(todo Todo) TodoDTO {

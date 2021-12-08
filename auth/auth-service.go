@@ -7,18 +7,21 @@ import (
 	"net/http"
 )
 
-type AuthService struct {
-	UserRepository user.UserRepository
+type ServiceAuth interface {
+	Login(user user.User) (user.User, common.DatabaseError)
+}
+type authService struct {
+	userRepository user.RepositoryUser
 }
 
-func ProvideAuthService(t user.UserRepository) AuthService {
-	return AuthService{UserRepository: t}
+func ProvideAuthService(u user.RepositoryUser) *authService {
+	return &authService{userRepository: u}
 }
 
-func (a *AuthService) Login(user user.User) (user.User, common.DatabaseError) {
+func (a *authService) Login(user user.User) (user.User, common.DatabaseError) {
 
 	errorCode := common.DatabaseError{}
-	checkUser, err := a.UserRepository.FindByUserName(user.Username)
+	checkUser, err := a.userRepository.FindByUserName(user.Username)
 	if err.Type == "error_01" {
 		errorCode = common.DatabaseError{
 			Code: http.StatusNotFound,

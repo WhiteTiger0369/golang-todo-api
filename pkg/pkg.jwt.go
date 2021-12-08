@@ -23,7 +23,7 @@ type AccessToken struct {
 
 func Sign(Data map[string]interface{}, SecretPublicKeyEnvName string, ExpiredAt time.Duration, userId uint) (string, error) {
 
-	expiredAt := time.Now().Add(time.Duration(time.Minute) * ExpiredAt).Unix()
+	expiredAt := time.Now().Add(time.Minute * ExpiredAt).Unix()
 
 	jwtSecretKey := GodotEnv(SecretPublicKeyEnvName)
 
@@ -82,7 +82,7 @@ func VerifyToken(accessToken, SecretPublicKeyEnvName string) (*jwt.Token, error)
 func DecodeToken(accessToken *jwt.Token) AccessToken {
 	var token AccessToken
 	stringify, _ := json.Marshal(&accessToken)
-	json.Unmarshal([]byte(stringify), &token)
+	json.Unmarshal(stringify, &token)
 
 	return token
 }

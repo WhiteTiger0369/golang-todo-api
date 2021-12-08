@@ -6,15 +6,22 @@ import (
 	"net/http"
 )
 
-type UserRepository struct {
+type RepositoryUser interface {
+	FindAll() ([]User, common.DatabaseError)
+	FindByID(id uint) (User, common.DatabaseError)
+	Save(user User) (User, common.DatabaseError)
+	Delete(id uint)
+	FindByUserName(username string) (User, common.DatabaseError)
+}
+type userRepository struct {
 	DB *gorm.DB
 }
 
-func ProvideUserRepository(DB *gorm.DB) UserRepository {
-	return UserRepository{DB: DB}
+func ProvideUserRepository(DB *gorm.DB) *userRepository {
+	return &userRepository{DB: DB}
 }
 
-func (u *UserRepository) FindAll() ([]User, common.DatabaseError) {
+func (u *userRepository) FindAll() ([]User, common.DatabaseError) {
 	var users []User
 	errorCode := common.DatabaseError{}
 
@@ -31,7 +38,7 @@ func (u *UserRepository) FindAll() ([]User, common.DatabaseError) {
 	return users, errorCode
 }
 
-func (u *UserRepository) FindByID(id uint) (User, common.DatabaseError) {
+func (u *userRepository) FindByID(id uint) (User, common.DatabaseError) {
 	var user User
 
 	errorCode := common.DatabaseError{}
@@ -50,7 +57,7 @@ func (u *UserRepository) FindByID(id uint) (User, common.DatabaseError) {
 
 }
 
-func (u *UserRepository) Save(user User) (User, common.DatabaseError) {
+func (u *userRepository) Save(user User) (User, common.DatabaseError) {
 
 	errorCode := common.DatabaseError{}
 
@@ -76,12 +83,12 @@ func (u *UserRepository) Save(user User) (User, common.DatabaseError) {
 	return user, errorCode
 }
 
-func (u *UserRepository) Delete(id uint) {
+func (u *userRepository) Delete(id uint) {
 	u.DB.Delete(User{}, "id = ?", id)
 
 }
 
-func (u *UserRepository) FindByUserName(username string) (User, common.DatabaseError) {
+func (u *userRepository) FindByUserName(username string) (User, common.DatabaseError) {
 	var user User
 	errorCode := common.DatabaseError{}
 	res := u.DB.First(&user, "username = ?", username)

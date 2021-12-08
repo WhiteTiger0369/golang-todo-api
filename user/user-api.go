@@ -8,16 +8,16 @@ import (
 	"strconv"
 )
 
-type UserAPI struct {
-	UserService UserService
+type userAPI struct {
+	userService ServiceUser
 }
 
-func ProvideUserAPI(u UserService) UserAPI {
-	return UserAPI{UserService: u}
+func ProvideUserAPI(u ServiceUser) *userAPI {
+	return &userAPI{userService: u}
 }
 
-func (u *UserAPI) FindAll(c *gin.Context) {
-	res, err := u.UserService.FindAll()
+func (u *userAPI) FindAll(c *gin.Context) {
+	res, err := u.userService.FindAll()
 
 	switch err.Type {
 	case "error_01":
@@ -27,9 +27,9 @@ func (u *UserAPI) FindAll(c *gin.Context) {
 	}
 }
 
-func (u *UserAPI) FindByID(c *gin.Context) {
+func (u *userAPI) FindByID(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	res, err := u.UserService.FindByID(uint(id))
+	res, err := u.userService.FindByID(uint(id))
 
 	switch err.Type {
 	case "error_01":
@@ -39,7 +39,7 @@ func (u *UserAPI) FindByID(c *gin.Context) {
 	}
 }
 
-func (u *UserAPI) Create(c *gin.Context) {
+func (u *userAPI) Create(c *gin.Context) {
 	var userDTO UserDTO
 	errIn := c.BindJSON(&userDTO)
 	if errIn != nil {
@@ -48,7 +48,7 @@ func (u *UserAPI) Create(c *gin.Context) {
 		return
 	}
 
-	res, err := u.UserService.Save(userDTO)
+	res, err := u.userService.Save(userDTO)
 
 	switch err.Type {
 	case "error_01":
@@ -62,7 +62,7 @@ func (u *UserAPI) Create(c *gin.Context) {
 	}
 }
 
-func (u *UserAPI) Update(c *gin.Context) {
+func (u *userAPI) Update(c *gin.Context) {
 	var userDTO UserDTO
 	err := c.BindJSON(&userDTO)
 	if err != nil {
@@ -72,7 +72,7 @@ func (u *UserAPI) Update(c *gin.Context) {
 	}
 
 	id, _ := strconv.Atoi(c.Param("id"))
-	user, _ := u.UserService.FindByID(uint(id))
+	user, _ := u.userService.FindByID(uint(id))
 	if user == (UserDTO{}) {
 		c.Status(http.StatusBadRequest)
 		return
@@ -81,15 +81,15 @@ func (u *UserAPI) Update(c *gin.Context) {
 	user.FullName = userDTO.FullName
 	user.Username = userDTO.Username
 	user.Password = userDTO.Password
-	u.UserService.Save(user)
+	u.userService.Save(user)
 
 	c.Status(http.StatusOK)
 }
 
-func (u *UserAPI) Delete(c *gin.Context) {
+func (u *userAPI) Delete(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	u.UserService.Delete(uint(id))
+	u.userService.Delete(uint(id))
 
 	c.Status(http.StatusOK)
 }

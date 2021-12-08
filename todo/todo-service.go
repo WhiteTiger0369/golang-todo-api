@@ -2,35 +2,42 @@ package todo
 
 import "ex1/todo-api/common"
 
-type TodoService struct {
-	TodoRepository TodoRepository
+type ServiceTodo interface {
+	FindAll() ([]TodoDTO, common.DatabaseError)
+	FindByID(id uint) (TodoDTO, common.DatabaseError)
+	Save(todoDTO TodoDTO) (TodoDTO, common.DatabaseError)
+	Delete(id uint)
+	FindByUserId(userId uint) ([]TodoDTO, common.DatabaseError)
+}
+type todoService struct {
+	todoRepository RepositoryTodo
 }
 
-func ProvideTodoService(t TodoRepository) TodoService {
-	return TodoService{TodoRepository: t}
+func ProvideTodoService(t RepositoryTodo) *todoService {
+	return &todoService{todoRepository: t}
 }
 
-func (t *TodoService) FindAll() ([]TodoDTO, common.DatabaseError) {
-	res, err := t.TodoRepository.FindAll()
+func (t *todoService) FindAll() ([]TodoDTO, common.DatabaseError) {
+	res, err := t.todoRepository.FindAll()
 	return ToTodoDTOs(res), err
 }
 
-func (t *TodoService) FindByID(id uint) (TodoDTO, common.DatabaseError) {
-	res, err := t.TodoRepository.FindByID(id)
+func (t *todoService) FindByID(id uint) (TodoDTO, common.DatabaseError) {
+	res, err := t.todoRepository.FindByID(id)
 	return ToTodoDTO(res), err
 }
 
-func (t *TodoService) Save(todoDTO TodoDTO) (TodoDTO, common.DatabaseError) {
-	res, err := t.TodoRepository.Save(ToTodo(todoDTO))
+func (t *todoService) Save(todoDTO TodoDTO) (TodoDTO, common.DatabaseError) {
+	res, err := t.todoRepository.Save(ToTodo(todoDTO))
 	return ToTodoDTO(res), err
 
 }
 
-func (t *TodoService) Delete(id uint) {
-	t.TodoRepository.Delete(id)
+func (t *todoService) Delete(id uint) {
+	t.todoRepository.Delete(id)
 }
 
-func (t *TodoService) FindByUserId(userId uint) ([]TodoDTO, common.DatabaseError) {
-	res, err := t.TodoRepository.FindByUserId(userId)
+func (t *todoService) FindByUserId(userId uint) ([]TodoDTO, common.DatabaseError) {
+	res, err := t.todoRepository.FindByUserId(userId)
 	return ToTodoDTOs(res), err
 }
