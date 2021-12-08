@@ -15,7 +15,7 @@ type authAPI struct {
 	authService services.AuthService
 }
 
-func ProvideAuthAPI(a services.AuthService) *authAPI {
+func NewAuthAPI(a services.AuthService) *authAPI {
 	return &authAPI{authService: a}
 }
 

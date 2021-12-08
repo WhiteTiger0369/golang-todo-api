@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-type RepositoryTodo interface {
+type TodoRepository interface {
 	FindAll() ([]entities.Todo, common.DatabaseError)
 	FindByID(id uint) (entities.Todo, common.DatabaseError)
 	Save(todo entities.Todo) (entities.Todo, common.DatabaseError)
@@ -19,7 +19,7 @@ type todoRepository struct {
 	DB *gorm.DB
 }
 
-func ProvideTodoRepository(DB *gorm.DB) *todoRepository {
+func NewTodoRepository(DB *gorm.DB) *todoRepository {
 	return &todoRepository{DB: DB}
 }
 

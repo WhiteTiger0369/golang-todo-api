@@ -10,9 +10,9 @@ import (
 
 func InitUserRoutes(db *gorm.DB, route *gin.Engine) {
 
-	repo := repositories.ProvideUserRepository(db)
-	service := services.ProvideUserService(repo)
-	api := api.ProvideUserAPI(service)
+	repo := repositories.NewUserRepository(db)
+	service := services.NewUserService(repo)
+	api := api.NewUserAPI(service)
 
 	groupRoute := route.Group("api/v1")
 	groupRoute.GET("/users/:id", api.FindByID)

@@ -10,9 +10,9 @@ import (
 
 func InitAuthRoutes(db *gorm.DB, route *gin.Engine) {
 
-	repo := repositories.ProvideUserRepository(db)
-	service := services.ProvideAuthService(repo)
-	api := api.ProvideAuthAPI(service)
+	repo := repositories.NewUserRepository(db)
+	service := services.NewAuthService(repo)
+	api := api.NewAuthAPI(service)
 
 	groupRoute := route.Group("api/v1")
 	groupRoute.POST("/login", api.Login)

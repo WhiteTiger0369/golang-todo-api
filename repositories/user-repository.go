@@ -7,18 +7,19 @@ import (
 	"net/http"
 )
 
-type RepositoryUser interface {
+type UserRepository interface {
 	FindAll() ([]entities.User, common.DatabaseError)
 	FindByID(id uint) (entities.User, common.DatabaseError)
 	Save(user entities.User) (entities.User, common.DatabaseError)
 	Delete(id uint)
 	FindByUserName(username string) (entities.User, common.DatabaseError)
 }
+
 type userRepository struct {
 	DB *gorm.DB
 }
 
-func ProvideUserRepository(DB *gorm.DB) *userRepository {
+func NewUserRepository(DB *gorm.DB) *userRepository {
 	return &userRepository{DB: DB}
 }
 
