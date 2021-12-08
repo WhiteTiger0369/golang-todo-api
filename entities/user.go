@@ -1,4 +1,4 @@
-package user
+package entities
 
 import (
 	"ex1/todo-api/pkg"

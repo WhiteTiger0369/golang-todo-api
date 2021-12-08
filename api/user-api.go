@@ -1,7 +1,9 @@
-package user
+package api
 
 import (
+	"ex1/todo-api/dtos"
 	"ex1/todo-api/helpers"
+	"ex1/todo-api/services"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -9,10 +11,10 @@ import (
 )
 
 type userAPI struct {
-	userService ServiceUser
+	userService services.UserService
 }
 
-func ProvideUserAPI(u ServiceUser) *userAPI {
+func ProvideUserAPI(u services.UserService) *userAPI {
 	return &userAPI{userService: u}
 }
 
@@ -40,7 +42,7 @@ func (u *userAPI) FindByID(c *gin.Context) {
 }
 
 func (u *userAPI) Create(c *gin.Context) {
-	var userDTO UserDTO
+	var userDTO dtos.UserDTO
 	errIn := c.BindJSON(&userDTO)
 	if errIn != nil {
 		c.Status(http.StatusBadRequest)
@@ -63,7 +65,7 @@ func (u *userAPI) Create(c *gin.Context) {
 }
 
 func (u *userAPI) Update(c *gin.Context) {
-	var userDTO UserDTO
+	var userDTO dtos.UserDTO
 	err := c.BindJSON(&userDTO)
 	if err != nil {
 		c.Status(http.StatusBadRequest)
@@ -73,7 +75,7 @@ func (u *userAPI) Update(c *gin.Context) {
 
 	id, _ := strconv.Atoi(c.Param("id"))
 	user, _ := u.userService.FindByID(uint(id))
-	if user == (UserDTO{}) {
+	if user == (dtos.UserDTO{}) {
 		c.Status(http.StatusBadRequest)
 		return
 	}

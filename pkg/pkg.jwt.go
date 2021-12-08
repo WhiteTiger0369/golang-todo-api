@@ -21,7 +21,7 @@ type AccessToken struct {
 	Claims MetaToken
 }
 
-func Sign(Data map[string]interface{}, SecretPublicKeyEnvName string, ExpiredAt time.Duration, userId uint) (string, error) {
+func Sign(Data map[string]interface{}, SecretPublicKeyEnvName string, ExpiredAt time.Duration) (string, error) {
 
 	expiredAt := time.Now().Add(time.Minute * ExpiredAt).Unix()
 
@@ -29,7 +29,6 @@ func Sign(Data map[string]interface{}, SecretPublicKeyEnvName string, ExpiredAt 
 
 	claims := jwt.MapClaims{}
 	claims["exp"] = expiredAt
-	claims["ID"] = userId
 	claims["authorization"] = true
 
 	for i, v := range Data {

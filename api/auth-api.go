@@ -1,9 +1,10 @@
-package auth
+package api
 
 import (
+	"ex1/todo-api/entities"
 	"ex1/todo-api/helpers"
 	"ex1/todo-api/pkg"
-	"ex1/todo-api/user"
+	"ex1/todo-api/services"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"log"
@@ -11,15 +12,15 @@ import (
 )
 
 type authAPI struct {
-	authService ServiceAuth
+	authService services.AuthService
 }
 
-func ProvideAuthAPI(a ServiceAuth) *authAPI {
+func ProvideAuthAPI(a services.AuthService) *authAPI {
 	return &authAPI{authService: a}
 }
 
 func (u *authAPI) Login(c *gin.Context) {
-	var userReq user.User
+	var userReq entities.User
 	errIn := c.BindJSON(&userReq)
 	if errIn != nil {
 		c.Status(http.StatusBadRequest)
@@ -37,8 +38,8 @@ func (u *authAPI) Login(c *gin.Context) {
 		helpers.APIResponse(c, "Username or password is wrong", err.Code, http.MethodPost, nil)
 		return
 	default:
-		accessTokenData := map[string]interface{}{"username": checkUser.Username, "password": checkUser.Password}
-		accessToken, errToken := pkg.Sign(accessTokenData, "JWT_SECRET", 24*60*1, checkUser.ID)
+		accessTokenData := map[string]interface{}{"username": checkUser.Username, "password": checkUser.Password, "id": checkUser.ID}
+		accessToken, errToken := pkg.Sign(accessTokenData, "JWT_SECRET", 24*60*1)
 
 		if errToken != nil {
 			defer logrus.Error(errToken.Error())

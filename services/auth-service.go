@@ -1,24 +1,25 @@
-package auth
+package services
 
 import (
 	"ex1/todo-api/common"
+	"ex1/todo-api/entities"
 	"ex1/todo-api/pkg"
-	"ex1/todo-api/user"
+	"ex1/todo-api/repositories"
 	"net/http"
 )
 
-type ServiceAuth interface {
-	Login(user user.User) (user.User, common.DatabaseError)
+type AuthService interface {
+	Login(user entities.User) (entities.User, common.DatabaseError)
 }
 type authService struct {
-	userRepository user.RepositoryUser
+	userRepository repositories.RepositoryUser
 }
 
-func ProvideAuthService(u user.RepositoryUser) *authService {
+func ProvideAuthService(u repositories.RepositoryUser) *authService {
 	return &authService{userRepository: u}
 }
 
-func (a *authService) Login(user user.User) (user.User, common.DatabaseError) {
+func (a *authService) Login(user entities.User) (entities.User, common.DatabaseError) {
 
 	errorCode := common.DatabaseError{}
 	checkUser, err := a.userRepository.FindByUserName(user.Username)
