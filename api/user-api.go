@@ -14,7 +14,7 @@ type userAPI struct {
 	userService services.UserService
 }
 
-func ProvideUserAPI(u services.UserService) *userAPI {
+func NewUserAPI(u services.UserService) *userAPI {
 	return &userAPI{userService: u}
 }
 
@@ -74,16 +74,7 @@ func (u *userAPI) Update(c *gin.Context) {
 	}
 
 	id, _ := strconv.Atoi(c.Param("id"))
-	user, _ := u.userService.FindByID(uint(id))
-	if user == (dtos.UserDTO{}) {
-		c.Status(http.StatusBadRequest)
-		return
-	}
-
-	user.FullName = userDTO.FullName
-	user.Username = userDTO.Username
-	user.Password = userDTO.Password
-	u.userService.Save(user)
+	u.userService.Update(uint(id), userDTO)
 
 	c.Status(http.StatusOK)
 }

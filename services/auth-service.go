@@ -11,11 +11,12 @@ import (
 type AuthService interface {
 	Login(user entities.User) (entities.User, common.DatabaseError)
 }
+
 type authService struct {
-	userRepository repositories.RepositoryUser
+	userRepository repositories.UserRepository
 }
 
-func ProvideAuthService(u repositories.RepositoryUser) *authService {
+func NewAuthService(u repositories.UserRepository) *authService {
 	return &authService{userRepository: u}
 }
 

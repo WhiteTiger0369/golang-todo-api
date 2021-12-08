@@ -11,9 +11,9 @@ import (
 
 func InitTodoRoutes(db *gorm.DB, route *gin.Engine) {
 
-	repo := repositories.ProvideTodoRepository(db)
-	service := services.ProvideTodoService(repo)
-	api := api.ProvideTodoAPI(service)
+	repo := repositories.NewTodoRepository(db)
+	service := services.NewTodoService(repo)
+	api := api.NewTodoAPI(service)
 
 	groupRoute := route.Group("api/v1").Use(middleware.Auth())
 	groupRoute.GET("/todos/:id", api.FindByID)

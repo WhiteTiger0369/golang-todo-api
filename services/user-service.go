@@ -12,12 +12,14 @@ type UserService interface {
 	FindByID(id uint) (dtos.UserDTO, common.DatabaseError)
 	Save(userDTO dtos.UserDTO) (dtos.UserDTO, common.DatabaseError)
 	Delete(id uint)
-}
-type userService struct {
-	userRepository repositories.RepositoryUser
+	Update(id uint, userDTO dtos.UserDTO) (dtos.UserDTO, common.DatabaseError)
 }
 
-func ProvideUserService(u repositories.RepositoryUser) *userService {
+type userService struct {
+	userRepository repositories.UserRepository
+}
+
+func NewUserService(u repositories.UserRepository) *userService {
 	return &userService{userRepository: u}
 }
 
@@ -38,4 +40,15 @@ func (u *userService) Save(userDTO dtos.UserDTO) (dtos.UserDTO, common.DatabaseE
 
 func (u *userService) Delete(id uint) {
 	u.userRepository.Delete(id)
+}
+
+func (u *userService) Update(id uint, userDTO dtos.UserDTO) (dtos.UserDTO, common.DatabaseError) {
+	existsUser, err := u.userRepository.FindByID(id)
+	if err.Type == "error_01" {
+		return userDTO, err
+	}
+	existsUser.FullName = userDTO.FullName
+	existsUser.Password = userDTO.Password
+	res, err := u.userRepository.Save(existsUser)
+	return mappers.ToUserDTO(res), err
 }

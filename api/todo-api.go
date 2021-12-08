@@ -15,7 +15,7 @@ type todoAPI struct {
 	todoService services.TodoService
 }
 
-func ProvideTodoAPI(p services.TodoService) *todoAPI {
+func NewTodoAPI(p services.TodoService) *todoAPI {
 	return &todoAPI{todoService: p}
 }
 
@@ -73,15 +73,7 @@ func (t *todoAPI) Update(c *gin.Context) {
 	}
 
 	id, _ := strconv.Atoi(c.Param("id"))
-	todo, _ := t.todoService.FindByID(uint(id))
-	if todo == (dtos.TodoDTO{}) {
-		c.Status(http.StatusBadRequest)
-		return
-	}
-
-	todo.Title = todoDTO.Title
-	todo.Content = todoDTO.Content
-	t.todoService.Save(todo)
+	t.todoService.Update(uint(id), todoDTO)
 
 	c.Status(http.StatusOK)
 }
