@@ -1,17 +1,18 @@
-package todo
+package repositories
 
 import (
 	"ex1/todo-api/common"
+	"ex1/todo-api/entities"
 	"github.com/jinzhu/gorm"
 	"net/http"
 )
 
 type RepositoryTodo interface {
-	FindAll() ([]Todo, common.DatabaseError)
-	FindByID(id uint) (Todo, common.DatabaseError)
-	Save(todo Todo) (Todo, common.DatabaseError)
+	FindAll() ([]entities.Todo, common.DatabaseError)
+	FindByID(id uint) (entities.Todo, common.DatabaseError)
+	Save(todo entities.Todo) (entities.Todo, common.DatabaseError)
 	Delete(id uint)
-	FindByUserId(userId uint) ([]Todo, common.DatabaseError)
+	FindByUserId(userId uint) ([]entities.Todo, common.DatabaseError)
 }
 
 type todoRepository struct {
@@ -22,8 +23,8 @@ func ProvideTodoRepository(DB *gorm.DB) *todoRepository {
 	return &todoRepository{DB: DB}
 }
 
-func (t *todoRepository) FindAll() ([]Todo, common.DatabaseError) {
-	var todos []Todo
+func (t *todoRepository) FindAll() ([]entities.Todo, common.DatabaseError) {
+	var todos []entities.Todo
 	errorCode := common.DatabaseError{}
 	results := t.DB.Debug().Find(&todos)
 
@@ -38,8 +39,8 @@ func (t *todoRepository) FindAll() ([]Todo, common.DatabaseError) {
 	return todos, errorCode
 }
 
-func (t *todoRepository) FindByID(id uint) (Todo, common.DatabaseError) {
-	var todo Todo
+func (t *todoRepository) FindByID(id uint) (entities.Todo, common.DatabaseError) {
+	var todo entities.Todo
 	errorCode := common.DatabaseError{}
 	res := t.DB.First(&todo, id)
 
@@ -54,7 +55,7 @@ func (t *todoRepository) FindByID(id uint) (Todo, common.DatabaseError) {
 	return todo, errorCode
 }
 
-func (t *todoRepository) Save(todo Todo) (Todo, common.DatabaseError) {
+func (t *todoRepository) Save(todo entities.Todo) (entities.Todo, common.DatabaseError) {
 
 	errorCode := common.DatabaseError{}
 	addUser := t.DB.Debug().Save(&todo)
@@ -70,11 +71,11 @@ func (t *todoRepository) Save(todo Todo) (Todo, common.DatabaseError) {
 }
 
 func (t *todoRepository) Delete(id uint) {
-	t.DB.Delete(Todo{}, "id = ?", id)
+	t.DB.Delete(entities.Todo{}, "id = ?", id)
 }
 
-func (t *todoRepository) FindByUserId(userId uint) ([]Todo, common.DatabaseError) {
-	var todos []Todo
+func (t *todoRepository) FindByUserId(userId uint) ([]entities.Todo, common.DatabaseError) {
+	var todos []entities.Todo
 	errorCode := common.DatabaseError{}
 	results := t.DB.Debug().Find(&todos, "user_id = ?", userId)
 

@@ -1,8 +1,10 @@
-package todo
+package api
 
 import (
+	"ex1/todo-api/dtos"
 	"ex1/todo-api/helpers"
 	"ex1/todo-api/pkg"
+	"ex1/todo-api/services"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -10,10 +12,10 @@ import (
 )
 
 type todoAPI struct {
-	todoService ServiceTodo
+	todoService services.TodoService
 }
 
-func ProvideTodoAPI(p ServiceTodo) *todoAPI {
+func ProvideTodoAPI(p services.TodoService) *todoAPI {
 	return &todoAPI{todoService: p}
 }
 
@@ -42,7 +44,7 @@ func (t *todoAPI) FindByID(c *gin.Context) {
 }
 
 func (t *todoAPI) Create(c *gin.Context) {
-	var todoDTO TodoDTO
+	var todoDTO dtos.TodoDTO
 	errIn := c.BindJSON(&todoDTO)
 	if errIn != nil {
 		c.Status(http.StatusBadRequest)
@@ -62,7 +64,7 @@ func (t *todoAPI) Create(c *gin.Context) {
 }
 
 func (t *todoAPI) Update(c *gin.Context) {
-	var todoDTO TodoDTO
+	var todoDTO dtos.TodoDTO
 	err := c.BindJSON(&todoDTO)
 	if err != nil {
 		c.Status(http.StatusBadRequest)
@@ -72,7 +74,7 @@ func (t *todoAPI) Update(c *gin.Context) {
 
 	id, _ := strconv.Atoi(c.Param("id"))
 	todo, _ := t.todoService.FindByID(uint(id))
-	if todo == (TodoDTO{}) {
+	if todo == (dtos.TodoDTO{}) {
 		c.Status(http.StatusBadRequest)
 		return
 	}

@@ -1,8 +1,7 @@
 package db
 
 import (
-	"ex1/todo-api/todo"
-	"ex1/todo-api/user"
+	"ex1/todo-api/entities"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/sirupsen/logrus"
@@ -21,8 +20,8 @@ func DatabaseConnect() *gorm.DB {
 	}
 
 	db.AutoMigrate(
-		&todo.Todo{},
-		&user.User{},
+		&entities.Todo{},
+		&entities.User{},
 	)
 
 	return db

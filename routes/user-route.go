@@ -1,16 +1,18 @@
 package routes
 
 import (
-	"ex1/todo-api/user"
+	"ex1/todo-api/api"
+	"ex1/todo-api/repositories"
+	"ex1/todo-api/services"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
 
 func InitUserRoutes(db *gorm.DB, route *gin.Engine) {
 
-	repo := user.ProvideUserRepository(db)
-	service := user.ProvideUserService(repo)
-	api := user.ProvideUserAPI(service)
+	repo := repositories.ProvideUserRepository(db)
+	service := services.ProvideUserService(repo)
+	api := api.ProvideUserAPI(service)
 
 	groupRoute := route.Group("api/v1")
 	groupRoute.GET("/users/:id", api.FindByID)

@@ -1,17 +1,18 @@
-package user
+package repositories
 
 import (
 	"ex1/todo-api/common"
+	"ex1/todo-api/entities"
 	"github.com/jinzhu/gorm"
 	"net/http"
 )
 
 type RepositoryUser interface {
-	FindAll() ([]User, common.DatabaseError)
-	FindByID(id uint) (User, common.DatabaseError)
-	Save(user User) (User, common.DatabaseError)
+	FindAll() ([]entities.User, common.DatabaseError)
+	FindByID(id uint) (entities.User, common.DatabaseError)
+	Save(user entities.User) (entities.User, common.DatabaseError)
 	Delete(id uint)
-	FindByUserName(username string) (User, common.DatabaseError)
+	FindByUserName(username string) (entities.User, common.DatabaseError)
 }
 type userRepository struct {
 	DB *gorm.DB
@@ -21,8 +22,8 @@ func ProvideUserRepository(DB *gorm.DB) *userRepository {
 	return &userRepository{DB: DB}
 }
 
-func (u *userRepository) FindAll() ([]User, common.DatabaseError) {
-	var users []User
+func (u *userRepository) FindAll() ([]entities.User, common.DatabaseError) {
+	var users []entities.User
 	errorCode := common.DatabaseError{}
 
 	results := u.DB.Debug().Find(&users)
@@ -38,8 +39,8 @@ func (u *userRepository) FindAll() ([]User, common.DatabaseError) {
 	return users, errorCode
 }
 
-func (u *userRepository) FindByID(id uint) (User, common.DatabaseError) {
-	var user User
+func (u *userRepository) FindByID(id uint) (entities.User, common.DatabaseError) {
+	var user entities.User
 
 	errorCode := common.DatabaseError{}
 
@@ -57,7 +58,7 @@ func (u *userRepository) FindByID(id uint) (User, common.DatabaseError) {
 
 }
 
-func (u *userRepository) Save(user User) (User, common.DatabaseError) {
+func (u *userRepository) Save(user entities.User) (entities.User, common.DatabaseError) {
 
 	errorCode := common.DatabaseError{}
 
@@ -84,12 +85,12 @@ func (u *userRepository) Save(user User) (User, common.DatabaseError) {
 }
 
 func (u *userRepository) Delete(id uint) {
-	u.DB.Delete(User{}, "id = ?", id)
+	u.DB.Delete(entities.User{}, "id = ?", id)
 
 }
 
-func (u *userRepository) FindByUserName(username string) (User, common.DatabaseError) {
-	var user User
+func (u *userRepository) FindByUserName(username string) (entities.User, common.DatabaseError) {
+	var user entities.User
 	errorCode := common.DatabaseError{}
 	res := u.DB.First(&user, "username = ?", username)
 
