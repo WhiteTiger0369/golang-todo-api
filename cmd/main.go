@@ -16,6 +16,7 @@ func main() {
 func SetupRouter() *gin.Engine {
 	database := db.DatabaseConnect()
 	app := gin.Default()
+	app.Use(gin.Recovery())
 
 	routes.InitTodoRoutes(database, app)
 	routes.InitUserRoutes(database, app)
